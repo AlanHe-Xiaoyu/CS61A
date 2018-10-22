@@ -1,0 +1,153 @@
+\documentclass{article}
+\usepackage[left=3cm, right=3cm, top=3cm]{geometry}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{soul}
+\usepackage{graphicx}
+\begin{document}
+
+\noindent{\Large HOF (Higher Order Functions), {\color{red} (Tree) Recursion}}
+\begin{itemize}
+	\item Tree recursion is useful for exploring different options: Making decisions, aggregating results, etc.
+	\item def f1(*args): \\
+	for i in args: ...
+\end{itemize}
+
+\noindent{\Large Python Lists (Env. Diag.), {\color{red} Trees}}
+\begin{itemize}
+	\item Cloning a list: if there are lists as elements of the original list, then they point to the same thing.
+	\item When you concatenate two lists, you are creating a new list.
+	\begin{itemize}
+		\item lst1 = [0, [1]]; lst2 = lst1[:]. Then, lst1 is not lst2, lst1[1] is lst2[1].
+	\end{itemize}
+	\item lst $= [1, 2, 3]$
+	\begin{itemize}
+		\item lst * $\mathbb{Z^-} = [\ ]$
+		\item $[1]$ is not [1]; [1] == [1]; [1].append != [1].append
+		\item lst$[-1] = 3$; lst$[:-1]$ = [1, 2]; lst$[:\ :-1] = [3, 2, 1]$
+		\item lst$[3$:$] = [\ ]$, lst$[3] =$ IndexError
+		\item new = lst[:] makes a \ul{copy} of lst; new = lst makes a pointer to the \ul{same} lst
+		\item lst.insert(100,7); lst == [1, 2, 3, 7]
+		\item lst.index(10) gives Error; lst.remove(10) gives Error.
+		\item lst = [0,1,2]; lst2 = [9,8] \\
+		lst[2:], lst2[1:] = lst2[1:], lst[2:] \\
+		lst == [0, 1, 8]; lst2 == [9, 2]
+	\end{itemize}
+	\item lst = [1]; lst = lst.append(0); lst is None; lst = lst.append(0) leads to ERROR
+	\item Draw env. diag of lst = list(other\_lst)
+	\item prune\_leaves(t, vals): \\
+	if is\_leaf(t):
+        return None if label(t) in vals else tree(label(t)) \\
+    else: return tree(label(t), [prune\_leaves(b, vals) for b in branches(t) if prune\_leaves(b, vals)])
+    \item def reverse(L): \# Reverses and mutate list: \\
+    for i in range(len(L)//2): \\
+    L[i], L[-i-1] = L[-i-1], L[i]
+\end{itemize}
+
+\noindent{\Large {\color{red} Nonlocal (Mutable Values/Functions)}, Iterators $\&$ Generators}
+\begin{itemize}
+	\item Global names cannot be modified using the nonlocal keyword.
+	\item Names in the current frame cannot be overridden using the nonlocal keyword. This means we cannot have both a local and nonlocal binding with the same name in a single frame.
+	\item Note that most iterators are also iterables - that is, calling iter on them will return an iterator. This means that we can use them inside for loops. However, calling iter on an iterator will return that same iterator, not a copy.
+	\item If a dictionary changes in structure because a key is added or removed, then all iterators become invalid gives Error. On the other hand, changing the value of an existing key does not invalidate iterators or change the order of their contents.
+	\item lst = [0, 1, 2]; i = iter(lst); next(i); lst.append(3); next(i); next(i); next(i) -- okay
+	\item {\color{red} *} If you want to yield infinitely many elements, then use while True; if you want to yield finitely many elements, then use for.
+	\item Calling the generator function returns a \textbf{generator} object. First next call to generator object:
+	\begin{enumerate}
+		\item Start at the top of the generator function body (Start at previous start position for Subsequent next calls to generator object)
+		\item Run until immediately after the first yield encountered
+		\item Return the value in the yield line
+		\item Save start position at line following yield
+	\end{enumerate}
+	\item lst = [0, 1, 2]; i = iter(lst); next(i); next(i); next(i) (almost reaches StopIteration). Now, if we use: lst.append(3) or lst.extend[3] or lst += [3], we could still call next(i) (returns 3). However, if we use: lst = lst + [3], calling next(i) would raise ERROR.
+	\item lst(iter) will take the iterator to the endpoint, i.e. next(iter) will raise StopIteration
+
+\begin{figure} [h!]
+\begin{center}
+	\includegraphics[width=0.75\linewidth]{/Users/Alan/Desktop/iter}
+	\label{fig}
+\end{center}
+\end{figure}
+\end{itemize}
+
+\noindent{\Large {\color{red} OOP (Object-Oriented Programming)}}
+\begin{itemize}
+	\item repr, str, print
+	\begin{itemize}
+		\item Displaying Instance, uses the \_\_repr\_\_ (output has no quotation marks)
+		\item repr(instance) calls \_\_repr\_\_ (always has quotation marks)
+		\item print(Instance) calls \_\_str\_\_ and displays the value of the returned string, and if \_\_str\_\_ isn't found, use the \_\_repr\_\_ (always no quotation marks)
+		\item str(Instance) calls \_\_str\_\_ and returns the value of the returned string (always with quotation marks)
+	\end{itemize}
+	\item As an attribute of a class, a method is just a function; but as an attribute of an instance, it is a bound method (instance.func is a method).
+	\item If an instance calls a parent class' function, then that instance will pass itself in as the first argument to the function. Otherwise, everything works like normal and you have to pass in all the arguments manually.
+	\item The parent of a function has to be a function frame, and the parent of an object has to be an object frame.
+\end{itemize}
+
+\noindent{\Large Orders of Growth, {\color{red} Linked Lists}}
+\begin{itemize}
+	\item $\Theta(1) < \Theta($log $n) < \Theta(n) < \Theta(n^b) < \Theta(b^n) < \Theta(n!)$
+	\item For recursion (recursive tree) structure: $\sum\limits_{\text{layers}}(\text{word per node})\times(\text{nodes per layer})$
+	\item Loops: (runtime to execute 1 loop) * (number of times looped) \\
+	Recursion: (runtime of 1 call) * (number of calls)
+	\item {\color{red} Link(1) != Link(1)} (while [1] == [1])
+	\item Order matters: lnk is Link.empty (or lnk.rest is Link.empty)
+\end{itemize}
+
+\noindent{\Large Extra Sanity Checks}
+\begin{itemize}
+	\item Dictionary keys can't be lists. Dictionary keys and values will be evaluated when being created. In essence, only functions will not evaluate their bodies when being created.
+	\item print(a, b) first evaluates all of its parameters and then prints everything: print(1, Error) only prints Error
+	\item A function only prints stuff due to (1) print statements or (2) the final return to Global frame
+	\item Whenever you see an equals sign:
+	\begin{enumerate}
+		\item Do not look at the left side of the equals sign;
+		\item Evaluate the right side of the equals sign. Draw the result somewhere with enough space;
+		\item Now look at the left side of the equals sign, and bind that value to what you just drew.
+	\end{enumerate}
+	\item Mutation:
+	\begin{itemize}
+		\item lst.append(item) takes element
+		\item lst.extend([item]) takes iterable
+		\item lst += [item] takes list (equivalent to .extend)
+	\end{itemize}
+	Cloning:
+	\begin{itemize}
+		\item list(lst) takes iterable
+		\item lst = lst + [item] takes list (concatenates)
+		\item lst[:]
+	\end{itemize}
+	\item For Tree problems, typically the base case is either a leaf or a condition on label (or a condition on the other passed-in variable if there exists), and the recursive calls get applied on branches.
+	\item txt = 'a\textbackslash tb'
+	\begin{itemize}
+		\item txt[1] gives: '\textbackslash t'
+		\item txt gives: 'a\textbackslash tb'
+		\item print(txt) gives: a (tab) b
+	\end{itemize}
+	\item def make\_anonymous\_factorial(): \\
+	return (lambda f: lambda k: f(f, k))(lambda f, k: k if k == 1 else mul(k, f(f, sub(k, 1))))
+	\item (1,) gives one-element (1,) tuple
+	\item a = range(0, 3); type(x for x in a) is a generator; type([x for x in a]) is a list. (Both could be sum()-ed)
+	\item Can add two tuples: (1,) + (2,) == (1,2)
+	\item x = (1,2); a,b = x gives a = 1, b = 2
+	\item Weird list comps etc.
+	\begin{itemize}
+		\item $[$i for i in range(3) if $i > 1$] gives [2]
+		\item $[$i if $i > 1$ else 100 for i in range(3)] gives [100, 100, 2]
+		\item 7 if 1 == 1 else 83 gives 7 (else cond. necessary)
+	\end{itemize}
+	\item Concatenate string with int: my\_str + str(my\_int)
+	\item my\_dict.get(key, default\_value)
+	\item Calling repr on anything (mostly) basically adds quotation marks around it
+	\item Set literals follow the mathematical notation of elements enclosed in \{braces\}. Duplicate elements are removed upon construction.
+	\item 'range' object is not an iterator
+\begin{figure} [h!]
+\begin{center}
+	\includegraphics[width=0.75\linewidth]{/Users/Alan/Desktop/cs61a_complxity}
+	\label{fig}
+\end{center}
+\end{figure}
+\end{itemize}
+
+\end{document}
