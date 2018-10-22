@@ -1,0 +1,23 @@
+{
+    "name": "Extra Homework 2",
+    "endpoint": "cal/cs198/sp18/extra02",
+    "src": [
+        "extra02.py"
+    ],
+    "tests": {
+        "extra02.py:letters": "doctest",
+        "extra02.py:decode": "doctest",
+        "extra02.py:decode_one": "doctest",
+        "extra02.py:encodings": "doctest",
+        "extra02.py:huffman": "doctest",
+        "extra02.py:make_ternary_constraint": "doctest",
+        "extra02.py:squarer": "doctest",
+        "extra02.py:pythagorean": "doctest"
+    },
+    "protocols": [
+        "file_contents",
+        "grading",
+        "analytics",
+        "backup"
+    ]
+}

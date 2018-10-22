@@ -1,0 +1,17 @@
+{
+    "name": "Extra Homework 1",
+    "endpoint": "cal/cs98-52/fa18/extra01",
+    "src": [
+        "extra01.py"
+    ],
+    "tests": {
+        "extra01.py:intersect": "doctest",
+        "extra01.py:cycle": "doctest"
+    },
+    "protocols": [
+        "file_contents",
+        "grading",
+        "analytics",
+        "backup"
+    ]
+}
