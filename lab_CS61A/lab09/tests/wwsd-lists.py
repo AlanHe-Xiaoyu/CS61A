@@ -7,74 +7,66 @@ test = {
         {
           'code': r"""
           scm> (cons 1 (cons 2 nil))
-          437da7fcde2856663fa0002aab0f0b14
-          # locked
+          (1 2)
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         },
         {
           'code': r"""
           scm> (car (cons 1 (cons 2 nil)))
-          d912fc844d1dbaeea8a84b3ec8b315bc
-          # locked
+          1
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         },
         {
           'code': r"""
           scm> (cdr (cons 1 (cons 2 nil)))
-          4c4505b119f53fac68e1f7117354f1e1
-          # locked
+          (2)
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         },
         {
           'code': r"""
           scm> (list 1 2 3)
-          7585771ecc8eac10b0735a645ecb8a79
-          # locked
+          (1 2 3)
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         },
         {
           'code': r"""
           scm> '(1 2 3)
-          7585771ecc8eac10b0735a645ecb8a79
-          # locked
+          (1 2 3)
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         },
         {
           'code': r"""
           scm> '(2 . 3)
-          54a1bf77dcb4d871279707fddceb2d17
-          # locked
+          (2 . 3)
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         },
         {
           'code': r"""
           scm> '(2 . (3))  ; Recall dot rule for pairs
-          812fc8d3741aa2f642b208f2d531234d
-          # locked
+          (2 3)
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         },
         {
           'code': r"""
           scm> (cons 1 '(list 2 3))  ; Recall quoting
-          826da030368e185a23a1a70897995e88
-          # locked
+          (1 list 2 3)
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         }
       ],
       'scored': True,
@@ -89,29 +81,26 @@ test = {
         {
           'code': r"""
           scm> (cons (list 2 (cons 3 4)) nil)
-          e34cac8f1ba66ae521ab3ae5dcfaf28b
-          # locked
+          ((2 (3 . 4)))
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         },
         {
           'code': r"""
           scm> (car (cdr '(127 . ((131 . (137))))))
-          3c07b200dbf1fe01a6b0c5977d8b6e05
-          # locked
+          (131 137)
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         },
         {
           'code': r"""
           scm> '(cons 4 (cons (cons 6 8) ()))
-          6117e327e7d53413652889593b49dd33
-          # locked
+          (cons 4 (cons (cons 6 8) ()))
           """,
           'hidden': False,
-          'locked': True
+          'locked': False
         }
       ],
       'scored': True,
