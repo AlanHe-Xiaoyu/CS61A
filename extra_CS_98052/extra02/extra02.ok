@@ -1,6 +1,6 @@
 {
     "name": "Extra Homework 2",
-    "endpoint": "cal/cs198/sp18/extra02",
+    "endpoint": "cal/cs98-52/fa18/extra02",
     "src": [
         "extra02.py"
     ],
