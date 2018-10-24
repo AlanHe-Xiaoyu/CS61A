@@ -257,6 +257,22 @@ def squarer(a, b):
     X = 4.0
     """
     "*** YOUR CODE HERE ***"
+    def new_value():
+        av, bv = [connector['has_val']() for connector in (a, b)]
+        if av:
+            b['set_val'](constraint, a['val'] ** 2)
+        elif bv:
+            a['set_val'](constraint, b['val'] ** 0.5)
+
+    def forget_value():
+        for connector in (a, b):
+            connector['forget'](constraint)
+
+    constraint = {'new_val': new_value, 'forget': forget_value}
+    for connector in (a, b):
+        connector['connect'](constraint)
+
+    return constraint
 
 def pythagorean(a, b, c):
     """Connect a, b, and c into a network for the Pythagorean theorem:
@@ -271,3 +287,19 @@ def pythagorean(a, b, c):
     B = 12.0
     """
     "*** YOUR CODE HERE ***"
+    def new_value():
+        av, bv, cv = [connector['has_val']() for connector in (a, b, c)]
+        if av and bv:
+            c['set_val'](constraint, (a['val'] ** 2 + b['val'] ** 2) ** 0.5)
+        elif av and cv:
+            b['set_val'](constraint, (c['val'] ** 2 - a['val'] ** 2) ** 0.5)
+        elif bv and cv:
+            a['set_val'](constraint, (c['val'] ** 2 - b['val'] ** 2) ** 0.5)
+
+    def forget_value():
+        for connector in (a, b, c):
+            connector['forget'](constraint)
+
+    constraint = {'new_val': new_value, 'forget': forget_value}
+    for connector in (a, b, c):
+        connector['connect'](constraint)
