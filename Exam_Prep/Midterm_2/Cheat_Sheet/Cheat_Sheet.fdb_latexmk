@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1539798969 "Cheat_Sheet.tex" "Cheat_Sheet.pdf" "Cheat_Sheet" 1539798970
+["pdflatex"] 1539798969 "Cheat_Sheet.tex" "Cheat_Sheet.pdf" "Cheat_Sheet" 1540599841
   "/Users/Alan/Desktop/cs61a_complxity.jpg" 1539726924 238607 0570391267f684884d8ea52eb142c696 ""
   "/Users/Alan/Desktop/iter.png" 1539388445 79249 445dbf50c3cb822e9f6f771a9573466d ""
   "/usr/local/texlive/2018/texmf-dist/fonts/map/fontname/texfonts.map" 1511824771 3332 103109f5612ad95229751940c61aada0 ""
@@ -70,6 +70,6 @@
   "Cheat_Sheet.aux" 1539798970 52 a94c7b04669cd034fccec82b5186fbc3 ""
   "Cheat_Sheet.tex" 1539798968 8321 29fb939e1795b1b30a65e74df146df2d ""
   (generated)
-  "Cheat_Sheet.aux"
-  "Cheat_Sheet.pdf"
   "Cheat_Sheet.log"
+  "Cheat_Sheet.pdf"
+  "Cheat_Sheet.aux"
