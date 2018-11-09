@@ -16,7 +16,7 @@
 
   (filter (lambda (x) (= item x)) lst)
 
-  ;;; Another possible solutoin
+  ;;; Another possible solution
   (cond
     ( (null? lst) nil )
     ( (= item (car lst)) (remove item (cdr lst)) )
