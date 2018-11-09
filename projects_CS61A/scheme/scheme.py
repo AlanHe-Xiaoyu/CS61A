@@ -32,6 +32,16 @@ def scheme_eval(expr, env, _=None): # Optional third argument is ignored
     else:
         # BEGIN PROBLEM 5
         "*** YOUR CODE HERE ***"
+        try:
+            first = scheme_eval(first, env)
+        except TypeError as e:
+            raise SchemeError(e)
+
+        check_procedure(first) # Check if the provided argument is a Scheme procedure
+        
+        rest = rest.map(lambda mapping: scheme_eval(mapping, env))
+        return scheme_apply(first, rest, env)
+
         # END PROBLEM 5
 
 def self_evaluating(expr):
@@ -52,6 +62,12 @@ def eval_all(expressions, env):
     """Evaluate each expression im the Scheme list EXPRESSIONS in
     environment ENV and return the value of the last."""
     # BEGIN PROBLEM 8
+    if expressions == nil:
+        return None
+    while expressions.second:
+        scheme_eval(expressions.first, env)
+        expressions = expressions.second
+
     return scheme_eval(expressions.first, env)
     # END PROBLEM 8
 
@@ -77,12 +93,17 @@ class Frame:
         """Define Scheme SYMBOL to have VALUE."""
         # BEGIN PROBLEM 3
         "*** YOUR CODE HERE ***"
+        self.bindings[symbol] = value
         # END PROBLEM 3
 
     def lookup(self, symbol):
         """Return the value bound to SYMBOL. Errors if SYMBOL is not found."""
         # BEGIN PROBLEM 3
         "*** YOUR CODE HERE ***"
+        if symbol in self.bindings.keys():
+            return self.bindings[symbol]
+        elif self.parent:
+            return self.parent.lookup(symbol)
         # END PROBLEM 3
         raise SchemeError('unknown identifier: {0}'.format(symbol))
 
@@ -100,6 +121,17 @@ class Frame:
         """
         # BEGIN PROBLEM 11
         "*** YOUR CODE HERE ***"
+        new_frame = Frame(self)
+
+        try:
+            while formals or vals:            
+                new_frame.define(formals.first, vals.first)
+                formals = formals.second
+                vals = vals.second
+        except AttributeError as e:
+            raise SchemeError(e)
+
+        return new_frame
         # END PROBLEM 11
 
 ##############
@@ -141,6 +173,13 @@ class BuiltinProcedure(Procedure):
             args = args.second
         # BEGIN PROBLEM 4
         "*** YOUR CODE HERE ***"
+        if self.use_env:
+            python_args.append(env)
+
+        try:
+            return self.fn(*python_args)
+        except TypeError as e:
+            raise SchemeError(e)
         # END PROBLEM 4
 
 class LambdaProcedure(Procedure):
@@ -159,6 +198,7 @@ class LambdaProcedure(Procedure):
         of values, for a lexically-scoped call evaluated in environment ENV."""
         # BEGIN PROBLEM 12
         "*** YOUR CODE HERE ***"
+        return self.env.make_child_frame(self.formals, args)
         # END PROBLEM 12
 
     def __str__(self):
@@ -200,10 +240,14 @@ def do_define_form(expressions, env):
         check_form(expressions, 2, 2)
         # BEGIN PROBLEM 6
         "*** YOUR CODE HERE ***"
+        env.bindings[target] = scheme_eval(expressions.second.first, env)
+        return target
         # END PROBLEM 6
     elif isinstance(target, Pair) and scheme_symbolp(target.first):
         # BEGIN PROBLEM 10
         "*** YOUR CODE HERE ***"
+        env.bindings[target.first] = do_lambda_form(Pair(target.second, expressions.second), env)
+        return target.first
         # END PROBLEM 10
     else:
         bad_target = target.first if isinstance(target, Pair) else target
@@ -214,6 +258,7 @@ def do_quote_form(expressions, env):
     check_form(expressions, 1, 1)
     # BEGIN PROBLEM 7
     "*** YOUR CODE HERE ***"
+    return expressions.first
     # END PROBLEM 7
 
 def do_begin_form(expressions, env):
@@ -228,6 +273,7 @@ def do_lambda_form(expressions, env):
     check_formals(formals)
     # BEGIN PROBLEM 9
     "*** YOUR CODE HERE ***"
+    return LambdaProcedure(formals, expressions.second, env)
     # END PROBLEM 9
 
 def do_if_form(expressions, env):
@@ -242,12 +288,40 @@ def do_and_form(expressions, env):
     """Evaluate a (short-circuited) and form."""
     # BEGIN PROBLEM 13
     "*** YOUR CODE HERE ***"
+    if expressions == nil:
+        return True
+
+    cur_val = scheme_eval(expressions.first, env)
+    if scheme_falsep(cur_val):
+        return cur_val
+
+    while expressions.second:
+        expressions = expressions.second
+        cur_val = scheme_eval(expressions.first, env)
+        if scheme_falsep(cur_val):
+            return cur_val
+
+    return cur_val
     # END PROBLEM 13
 
 def do_or_form(expressions, env):
     """Evaluate a (short-circuited) or form."""
     # BEGIN PROBLEM 13
     "*** YOUR CODE HERE ***"
+    if expressions == nil:
+        return False
+
+    cur_val = scheme_eval(expressions.first, env)
+    if scheme_truep(cur_val):
+        return cur_val
+
+    while expressions.second:
+        expressions = expressions.second
+        cur_val = scheme_eval(expressions.first, env)
+        if scheme_truep(cur_val):
+            return cur_val
+
+    return cur_val
     # END PROBLEM 13
 
 def do_cond_form(expressions, env):
@@ -264,6 +338,10 @@ def do_cond_form(expressions, env):
         if scheme_truep(test):
             # BEGIN PROBLEM 14
             "*** YOUR CODE HERE ***"
+            if not clause.second:
+                return test
+            else:
+                return eval_all(clause.second, env)
             # END PROBLEM 14
         expressions = expressions.second
 
@@ -282,6 +360,23 @@ def make_let_frame(bindings, env):
         raise SchemeError('bad bindings list in let form')
     # BEGIN PROBLEM 15
     "*** YOUR CODE HERE ***"
+    cur_pair = bindings.first
+    check_form(cur_pair, 2, 2)
+    formals = Pair(cur_pair.first, nil)
+    vals = Pair(scheme_eval(cur_pair.second.first, env), nil)
+
+    while bindings.second:
+        bindings = bindings.second
+        cur_pair = bindings.first
+        check_form(cur_pair, 2, 2)
+
+        formals = Pair(cur_pair.first, formals)
+        vals = Pair(scheme_eval(cur_pair.second.first, env), vals)
+
+    check_formals(formals)
+
+    return env.make_child_frame(formals, vals)
+    
     # END PROBLEM 15
 
 def do_define_macro(expressions, env):
@@ -402,6 +497,8 @@ class MuProcedure(Procedure):
 
     # BEGIN PROBLEM 16
     "*** YOUR CODE HERE ***"
+    def make_call_frame(self, args, env):
+        return env.make_child_frame(self.formals, args)
     # END PROBLEM 16
 
     def __str__(self):
@@ -418,6 +515,7 @@ def do_mu_form(expressions, env):
     check_formals(formals)
     # BEGIN PROBLEM 16
     "*** YOUR CODE HERE ***"
+    return MuProcedure(formals, expressions.second)
     # END PROBLEM 16
 
 SPECIAL_FORMS['mu'] = do_mu_form

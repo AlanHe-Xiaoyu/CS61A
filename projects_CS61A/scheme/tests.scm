@@ -10,7 +10,197 @@
 ;;; *** Add your own tests here! ***
 ;;; ********************************
 ; BEGIN PROBLEM 0
-'replace-this-line
+
++
+; expect #[+]
+
+a
+; expect Error: unknown identifier: a
+
+83
+; expect 83
+
+(even 83)
+; expect Error: unknown identifier: a
+
+(even? 83)
+; expect #f
+
+(+
+  (*
+    10
+    (+
+      83
+      (- 87 4)
+      (/ 70 5)
+      21
+    )
+  )
+  (*
+    2
+    2
+    2
+  )
+)
+; expect 2018
+
+(eval (define e 2.71))
+; expect 2.71
+
+(define a (/ e 2))
+; expect a
+
+a
+; expect 1.355
+
+(define x 1 2)
+; expect Error
+
+x
+; expect Error
+
+(define x 'old)
+; expect x
+
+((define x 'new) 'should_fail)
+; expect Error
+
+x
+; expect new
+
+'(1 2 3 4)
+; expect (1 2 3 4)
+
+'(1 2 . (3 . (4 . 5)))
+; expect (1 2 3 4 . 5)
+
+`(10 ,(* 2 (+ 1 2)) 83 new x ,x)
+; expect (10 6 83 new x new)
+
+; Q8
+(define x (begin (display 5) (newline) (define x 5) (+ x x)))
+; expect 5; x
+
+(begin (print 5) (* x x))
+; expect 5; 100
+
+; Q9
+(lambda (katie tuanzi alan) (+ (/ katie tuanzi) alan alan))
+; expect (lambda (katie tuanzi alan) (+ (/ katie tuanzi) alan alan))
+
+; Q10
+(define (tuanzai alan) (+ alan 5))
+; expect tuanzai
+
+tuanzai
+; expect (lambda (alan) (+ alan 5))
+
+; Q11/12
+(define (tuanzi a h)
+    (define (zai lan e)
+      (+ lan e)
+    )
+    (display (* a h))
+    (newline)
+    zai
+)
+; expect tuanzi
+
+(tuanzi 5 10)
+; expect 50; (lambda (lan e) (+ lan e))
+
+((tuanzi 5 10) 83 5)
+; expect 88
+
+; Q13
+(or)
+; expect #f
+
+(and)
+; expect #t
+
+(and 0 1)
+; expect 1
+
+; Q14
+(cond
+  (#t)
+  ((1) 'notprinting)
+)
+; expect #t
+
+(cond
+  (#f)
+  (#t 'printing)
+)
+; expect printing
+
+(cond
+  (#f 'notprinting)
+  ((+ 1 1) (+ 2 2))
+  (else 'aaa)
+)
+; expect 4
+
+(cond
+  (#f 'notprinting)
+  ((> 1 1) (+ 2 2))
+  (else 'tuanzai)
+)
+; expect tuanzai
+
+; Q15
+(define tuanzai 0)
+; expect tuanzai
+
+(let (tuanzai 5 83) 1)
+; expect Error
+
+(let (tuanzai 583) tuanzai)
+; expect Error
+
+(let ((tuanzai 583)) 1)
+; expect 1
+
+(let ((tuanzai 583) (ah (- tuanzai 1))) (* tuanzai ah))
+; expect -583
+
+; Q16
+
+(define tuan 5)
+; expect tuan
+
+(define f (mu (tuantuan) (+ (* tuantuan new_tuan 2) tuanzai)))
+; expect f
+
+(define
+  (eval_f new_tuan tuanzai)
+  (f (+ new_tuan tuanzai (* tuanzai tuanzai)))
+)
+; expect eval_f
+
+(eval_f 5 2)
+; expect 112
+
+; ------ Phase 2 End
+
+
+; +
+; ; expect 0
+
+; -
+; ; expect Error
+
+; *
+; ; expect 1
+
+; /
+; ; expect Error
+
+; (not 5)
+; ; expect #f
+
+
 ; END PROBLEM 0
 
 ;;; These are examples from several sections of "The Structure
@@ -60,7 +250,6 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; Move the following (exit) line down the file to run additional tests. ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(exit)
 
 
 ;;; 1.1.2
@@ -611,7 +800,7 @@ one-through-four
 (sum 1001 0)
 ; expect 501501
 
-(exit)
+; (exit)
 
 ; macro tests
 
@@ -646,3 +835,5 @@ one-through-four
 
 (hyp 3 4)
 ; expect 5.000023178253949
+
+(exit)
