@@ -162,6 +162,11 @@ tuanzai
 (let ((tuanzai 583)) 1)
 ; expect 1
 
+(define ah 10)
+; expect ah
+(let ((tuanzi (define ah (+ ah 5)))) ah)
+; expect 15
+
 (let ((tuanzai 583) (ah (- tuanzai 1))) (* tuanzai ah))
 ; expect -583
 
@@ -184,21 +189,8 @@ tuanzai
 
 ; ------ Phase 2 End
 
-
-; +
-; ; expect 0
-
-; -
-; ; expect Error
-
-; *
-; ; expect 1
-
-; /
-; ; expect Error
-
-; (not 5)
-; ; expect #f
+(not 5)
+; expect #f
 
 
 ; END PROBLEM 0
@@ -773,8 +765,7 @@ one-through-four
 ;;; Extra credit ;;;
 ;;;;;;;;;;;;;;;;;;;;
 
-(exit)
-
+; Q20
 ; Tail call optimization tests
 
 (define (sum n total)
@@ -800,8 +791,7 @@ one-through-four
 (sum 1001 0)
 ; expect 501501
 
-; (exit)
-
+; Q21
 ; macro tests
 
 (define (map f lst)

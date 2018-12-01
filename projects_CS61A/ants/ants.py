@@ -331,14 +331,13 @@ class FireAnt(Ant):
         """
         # BEGIN Problem 5
         "*** YOUR CODE HERE ***"
-        self.armor -= amount
+        ant_place = self.place
+        Ant.reduce_armor(self, amount)
+        
         if self.armor <= 0:
-            all_bees = self.place.bees[:]
+            all_bees = ant_place.bees[:]
             for bee in all_bees:
                 bee.reduce_armor(self.damage)
-            
-            self.place.bees = [bee for bee in all_bees if bee.armor]
-            self.place.remove_insect(self)
         # END Problem 5
 
 class HungryAnt(Ant):

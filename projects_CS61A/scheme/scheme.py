@@ -33,15 +33,17 @@ def scheme_eval(expr, env, _=None): # Optional third argument is ignored
         # BEGIN PROBLEM 5
         "*** YOUR CODE HERE ***"
         try:
-            first = scheme_eval(first, env)
+            proc = scheme_eval(first, env)
         except TypeError as e:
             raise SchemeError(e)
 
-        check_procedure(first) # Check if the provided argument is a Scheme procedure
-        
-        rest = rest.map(lambda mapping: scheme_eval(mapping, env))
-        return scheme_apply(first, rest, env)
+        check_procedure(proc) # Check if the provided argument is a Scheme procedure
 
+        if isinstance(proc, MacroProcedure):
+            return scheme_eval(proc.apply_macro(rest, proc.env), env)
+
+        rest = rest.map(lambda mapping: scheme_eval(mapping, env))
+        return scheme_apply(proc, rest, env)
         # END PROBLEM 5
 
 def self_evaluating(expr):
@@ -64,11 +66,12 @@ def eval_all(expressions, env):
     # BEGIN PROBLEM 8
     if expressions == nil:
         return None
+
     while expressions.second:
         scheme_eval(expressions.first, env)
         expressions = expressions.second
 
-    return scheme_eval(expressions.first, env)
+    return scheme_eval(expressions.first, env, True)
     # END PROBLEM 8
 
 ################
@@ -280,9 +283,9 @@ def do_if_form(expressions, env):
     """Evaluate an if form."""
     check_form(expressions, 2, 3)
     if scheme_truep(scheme_eval(expressions.first, env)):
-        return scheme_eval(expressions.second.first, env)
+        return scheme_eval(expressions.second.first, env, True)
     elif len(expressions) == 3:
-        return scheme_eval(expressions.second.second.first, env)
+        return scheme_eval(expressions.second.second.first, env, True)
 
 def do_and_form(expressions, env):
     """Evaluate a (short-circuited) and form."""
@@ -297,7 +300,10 @@ def do_and_form(expressions, env):
 
     while expressions.second:
         expressions = expressions.second
-        cur_val = scheme_eval(expressions.first, env)
+        if len(expressions) != 1:
+            cur_val = scheme_eval(expressions.first, env)
+        else:
+            cur_val = scheme_eval(expressions.first, env, True)
         if scheme_falsep(cur_val):
             return cur_val
 
@@ -317,7 +323,10 @@ def do_or_form(expressions, env):
 
     while expressions.second:
         expressions = expressions.second
-        cur_val = scheme_eval(expressions.first, env)
+        if len(expressions) != 1:
+            cur_val = scheme_eval(expressions.first, env)
+        else:
+            cur_val = scheme_eval(expressions.first, env, True)
         if scheme_truep(cur_val):
             return cur_val
 
@@ -360,18 +369,15 @@ def make_let_frame(bindings, env):
         raise SchemeError('bad bindings list in let form')
     # BEGIN PROBLEM 15
     "*** YOUR CODE HERE ***"
-    cur_pair = bindings.first
-    check_form(cur_pair, 2, 2)
-    formals = Pair(cur_pair.first, nil)
-    vals = Pair(scheme_eval(cur_pair.second.first, env), nil)
+    formals, vals = nil, nil
 
-    while bindings.second:
-        bindings = bindings.second
+    while bindings:
         cur_pair = bindings.first
         check_form(cur_pair, 2, 2)
-
         formals = Pair(cur_pair.first, formals)
-        vals = Pair(scheme_eval(cur_pair.second.first, env), vals)
+        vals = Pair(scheme_eval(cur_pair.second.first, env), vals)            
+        
+        bindings = bindings.second
 
     check_formals(formals)
 
@@ -383,6 +389,21 @@ def do_define_macro(expressions, env):
     """Evaluate a define-macro form."""
     # BEGIN Problem 21
     "*** YOUR CODE HERE ***"
+    check_form(expressions, 2)
+    target = expressions.first
+    if isinstance(target, Pair) and scheme_symbolp(target.first):
+        def do_macro_form(expressions, env):
+            check_form(expressions, 2)
+            formals = expressions.first
+            check_formals(formals)
+            return MacroProcedure(formals, expressions.second, env)
+
+        env.bindings[target.first] = do_macro_form(Pair(target.second, expressions.second), env)
+        return target.first
+
+    else:
+        bad_target = target.first if isinstance(target, Pair) else target
+        raise SchemeError('non-symbol: {0}'.format(bad_target))
     # END Problem 21
 
 
@@ -582,15 +603,19 @@ def optimize_tail_calls(original_scheme_eval):
             return Thunk(expr, env)
 
         result = Thunk(expr, env)
-        # BEGIN
+        # BEGIN Problem 20
         "*** YOUR CODE HERE ***"
+        while isinstance(result, Thunk):
+            result = original_scheme_eval(result.expr, result.env)
+
+        return result
         # END
     return optimized_eval
 
 ################################################################
 # Uncomment the following line to apply tail call optimization #
 ################################################################
-# scheme_eval = optimize_tail_calls(scheme_eval)
+scheme_eval = optimize_tail_calls(scheme_eval)
 
 
 ####################
