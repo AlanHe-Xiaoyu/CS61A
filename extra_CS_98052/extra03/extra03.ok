@@ -1,0 +1,16 @@
+{
+    "name": "Extra Homework 3",
+    "endpoint": "cal/cs98-52/fa18/extra03",
+    "src": [
+        "extra03.py"
+    ],
+    "tests": {
+        "extra03.py:all_final_frames": "doctest"
+    },
+    "protocols": [
+        "file_contents",
+        "grading",
+        "analytics",
+        "backup"
+    ]
+}
