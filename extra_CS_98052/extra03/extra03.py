@@ -85,6 +85,44 @@ def all_final_frames(initial_frame, threads):
 
     def execute_all(frame, threads):
         "*** YOUR CODE HERE ***"
+        # Base Case 0: no thread left
+        if not threads:
+            final_frames.append(frame)
+            return
+
+        # Establish a copy of the frame and list of threads to be referenced in future
+        frame_copy = frame.copy()
+        threads_copy = threads.copy()
+
+        for index in range(len(threads)):
+            thread = threads[index]
+
+            if thread.lock: # Then run all the statements inside
+                # Execute all the statements from this thread
+                for statement in thread.statements:
+                    frame_copy = execute(statement, frame_copy)
+                
+                # Remove the thread
+                cur_threads = threads_copy[:index]
+                cur_threads.extend(threads_copy[index+1:])
+
+            else: # Then only run the first statement of this thread
+                # Execute the statement
+                cur_statement = thread.statements[0]
+                frame_copy = execute(cur_statement, frame_copy)
+
+                # Delete the first statement from the thread
+                cur_threads = threads_copy[:index]
+                if len(thread.statements) > 1: # There are >1 statements originally
+                    new_thread = Thread(thread.statements[1:])
+                    new_thread.lock = thread.lock
+                    cur_threads.append(new_thread)
+                cur_threads.extend(threads_copy[index+1:])
+
+            execute_all(frame_copy, cur_threads) # Recursion on rest of the threads and their statements
+            frame_copy = frame.copy()
+
+        return
 
     execute_all(initial_frame, threads)
     return final_frames
