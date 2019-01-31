@@ -2,25 +2,52 @@
 
 ; Q6
 (define (nodots s)
-  'YOUR-CODE-HERE
-
+  (cond ((null? s) nil)
+    ((not (pair? s)) (list s))
+    ((pair? (car s))
+      (cons (nodots (car s)) (nodots (cdr s))))
+    ((pair? s)
+      (cons (car s) (nodots (cdr s)))))
 )
 
 ; Q7
 (define (has-cycle? s)
   (define (pair-tracker seen-so-far curr)
-    (cond (_________________ ____________)
-          (_________________ ____________)
-          (else _________________________))
+    (cond ((null? curr) #f)
+          ((contains? seen-so-far (car curr)) #t)
+          (else (pair-tracker (cons (car curr) seen-so-far) (cdr-stream curr)) ))
     )
-  ______________________________
+
+  (pair-tracker nil s)
 )
 
 (define (contains? lst s)
-  'YOUR-CODE-HERE
+  (cond
+    ((null? lst) #f)
+    ((eq? (car lst) s) #t)
+    (else (contains? (cdr lst) s))
+  )
 )
 
 ; Q8
+; ; scm> (switch (+ 1 1) ((1 (print 'a))
+; ;                       (2 (print 'b))
+; ;                       (3 (print 'c))))
+; ; b
 (define-macro (switch expr cases)
-    'YOUR-CODE-HERE
+  `(filter (lambda x: (= (car (quote ,(car cases))) ,expr)) ,cases)
+
+  ; `(map list ,cases)
+  ; `(car (quote ,(car cases)))
+
+; Solution #2
+  ; (cons 'cond 
+  ;   (map
+  ;     (lambda (case)
+  ;       (cons `(equal? ,expr (quote ,(car case))) (cdr case))
+  ;     )
+  ;     cases
+  ;   )
+  ; )
 )
+

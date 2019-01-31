@@ -15,6 +15,20 @@ def num_splits(s, d):
     12
     """
     "*** YOUR CODE HERE ***"
+    count = 0
+
+    def helper(cur_s, cur_dif):
+        nonlocal count
+        if not cur_s:
+            count += (abs(cur_dif) <= d)
+        else:
+            first = cur_s[0]
+            helper(cur_s[1:], cur_dif + first)
+            helper(cur_s[1:], cur_dif - first)
+    
+    helper(s, 0)
+    return count // 2
+
 
 # Q5
 def insert(link, value, index):
@@ -33,6 +47,14 @@ def insert(link, value, index):
     IndexError
     """
     "*** YOUR CODE HERE ***"
+    if index == 0:
+        link.rest = Link(link.first, link.rest)
+        link.first = value
+    elif link.rest is Link.empty:
+        raise IndexError
+    else:
+        insert(link.rest, value, index - 1)
+        
 
 class Link:
     """A linked list.

@@ -2,20 +2,22 @@
 
 -- Q5
 CREATE TABLE fa18favpets AS
-  SELECT "REPLACE THIS LINE WITH YOUR SOLUTION";
+  SELECT pet, COUNT(*) as count FROM students GROUP BY pet
+    ORDER BY count DESC LIMIT 10;
 
 
 CREATE TABLE fa18dog AS
-  SELECT "REPLACE THIS LINE WITH YOUR SOLUTION";
+  SELECT pet, COUNT(*) FROM students WHERE pet = 'dog';
 
 
 CREATE TABLE fa18alldogs AS
-  SELECT "REPLACE THIS LINE WITH YOUR SOLUTION";
+  SELECT pet, COUNT(*) FROM students WHERE pet LIKE '%dog%';
 
 
 CREATE TABLE obedienceimages AS
-  SELECT "REPLACE THIS LINE WITH YOUR SOLUTION";
+  SELECT seven, denero, COUNT(*) FROM students WHERE seven = '7' GROUP BY denero;
 
 -- Q6
 CREATE TABLE smallest_int_count AS
-  SELECT "REPLACE THIS LINE WITH YOUR SOLUTION";
+  SELECT smallest, COUNT(*) FROM students
+    GROUP BY smallest;

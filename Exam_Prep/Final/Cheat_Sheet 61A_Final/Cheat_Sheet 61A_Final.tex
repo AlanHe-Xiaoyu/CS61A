@@ -7,33 +7,173 @@
 \usepackage{graphicx}
 \begin{document}
 
-\noindent{\Large ? {\color{red} ?}}
+\noindent{\Large {\color{blue} Scheme}}
 \begin{itemize}
-	\item Tree recursion is useful for exploring different options: Making decisions, aggregating results, etc.
-	\item def f1(*args): \\
-	for i in args: ...
+	\item Call expressions in Scheme work exactly like they do in Python
+	\begin{enumerate}
+		\item Evaluate operator
+		\item Evaluate operands from left to right.
+		\item Apply the value of the operator to the evaluated operands.
+	\end{enumerate}
+	\item (cdr (cons 1 (cons 2 nil))) $\longrightarrow$ (2)
+	\item (car (cdr '(127 . ((131 . (137)))))) $\longrightarrow$
+	(car (cdr ‘(127 (131 137)))) $\longrightarrow$ (131 137)
+	\item (define (composed f g) (lambda (x) (f (g x))) )
+	\item ((+ 1 2)) $\longrightarrow$ Error (int is not callable)
+	\item (= 0 \#t) $\longrightarrow$ Error (\#t is not a number)
+	\item (if 0 'cond 'else) $\longrightarrow$ cond
+	\item (if (or \#t (/ 1 0)) 1 (/ 1 0)) $\longrightarrow$ 1
+	\item =, eq?, equal?
+	\begin{itemize}
+		\item = can only be used for comparing numbers.
+		\item eq? behaves like == in Python for comparing two {\color{red} non-pairs}. Otherwise, eq? behaves like is in Python.
+		\item equal? compares pairs by determining if their cars and cdrs are equal (i.e. have the same contents). Otherwise, equal? behaves like eq?.
+	\end{itemize}
+
 \end{itemize}
 
-\noindent{\Large ? {\color{red} ? }}
+
+
+\noindent{\Large {\color{blue} Interpreters, Tail Recursion }}
 \begin{itemize}
-	\item a
+	\item REPL: Read-Eval-Print Loop
+	\begin{itemize}
+		\item Read: Calls lexer, which breaks input into tokens. Calls parser, which organizes the tokens into data structures.
+		\item Eval: Mutual recursion between eval and apply. eval evaluates expressions (through lookups or by recursively calling eval and apply). apply applies an evaluated operator to its evaluated operands.
+		\item Print: Display the result of evaluating user input.
+		\item Loop: Repeat if there are more expressions to interpret.
+	\end{itemize}
+	\item \# of times scheme\_apply: Use arrows for each function call (operators, exclusing special forms)
+	\item \# of times scheme\_eval: Use underline for each expression (look for parentheses) and each value (operators + operands, but excluding special forms again)
+	
+	\item Special forms (not scheme\_evaled or scheme\_applied)
+	\begin{itemize}
+		\item define
+		\begin{itemize}
+			\item +1 scheme\_eval for the entire expr
+			\item Variable: only evaluate expr you are binding to variable name, e.g. (define $a$ 3) have another scheme\_eval for 3
+			\item Function: no additional scheme\_eval
+			\item For functions, only evaluate function body when function is called
+		\end{itemize}
+		\item define-macro, lambda, mu: no evaluation until called (only 1 scheme\_eval for entire expr)
+		\item if, cond, and, or: short-circuiting
+		\item let: evaluate all exprs in bindings, then evaluate exprs in the body
+		\item begin: evaluate all operands
+		\item quote, quasiquote, unquote, unquote-splicing: no evaluation
+		\item cons-stream
+		\item delay, set!
+	\end{itemize}
+
+	\item A {\color{red} tail call} occurs when a func calls another func as its last action of the current frame. In this case, the frame is no longer needed, and we can remove it from memory, i.e. we can reuse the current frame instead of making a new frame.
+	\item Tail-Recursion $\longrightarrow$ Pass-Down Recursion $\longrightarrow$ helper function + an argument that represents the “result so far”
 
 \end{itemize}
 
-\noindent{\Large ? {\color{red} ? }}
+
+
+\noindent{\Large {\color{blue} Macros, Streams }}
 \begin{itemize}
-	\item a
+	\item (define-macro (f x) (car x))
+	\begin{itemize}
+		\item (f (+ 2 3)) $\longrightarrow$ \#[+]
+		\item (f (x y z)) $\longrightarrow$ Error
+		\item (define x 2000) (f (x y z)) $\longrightarrow$ 2000
+		\item (f (list 2 3 4)) $\longrightarrow$ \#[list]
+		\item (f (quote (2 3 4))) $\longrightarrow$ SchemeError
+	\end{itemize}
+	\item Evaluating calls to macro procedures are:
+	\begin{enumerate}
+		\item Evaluate operator
+		\item Apply operator to unevaluated operands
+		\item Evaluate the expression returned by the macro in the frame it was called in.
+		\item For quasiquote, entire expr +1, scheme\_eval any unquote and ignore others.
+	\end{enumerate}
+	\item Streams have two important properties: Lazy evaluation, Memoization
+	\item cons-stream, car, cdr-stream (computes and returns the rest of stream), nil (empty-stream), cdr (gets rest of a stream wrapped in a promise)
+	\begin{itemize}
+		\item (define (naturals n) (cons-stream n (naturals (+ n 1)))) $\longrightarrow$ naturals \\
+		(define nat (naturals 0)) $\longrightarrow$ nat \\
+		(car nat) $\longrightarrow$ 0; (cdr nat) $\longrightarrow$ \#[promise (not forced)] \\
+		(car (cdr-stream nat)) $\longrightarrow$ 1 \\
+		(car (cdr-stream (cdr-stream nat))) $\longrightarrow$ 2 \\
+		(cdr-stream nat) $\longrightarrow$ (1 . \#[promise (forced)])
+		\item (define (compute-rest n) (print 'evaluating!) (cons-stream n nil)) $\longrightarrow$ compute-rest \\
+		(define s (cons-stream 0 (compute-rest 1))) $\longrightarrow$ s \\
+		(car (cdr-stream s)) $\longrightarrow$ evaluating! \textbackslash n 1 \\
+		(car (cdr-stream s)) $\longrightarrow$ 1
+
+	\end{itemize}
+	\item (define factorials (cons-stream 1 (combine-with * (naturals 1) factorials)))
+	\item Macro that strips out every other argument: \\
+	(define (prune lst)
+	{\color{green}(}if {\color{blue}(}or (null? lst) (null? (cdr lst)){\color{blue})} lst
+	{\color{red}(}cons (car lst) (prune (cdr (cdr lst))){\color{red})}{\color{green})}) \\
+	(define-macro (prune-expr expr)
+	(cons (car expr) (prune (cdr expr)))) \\
+	scm$>$ (prune-expr (prune-expr (+ 10 100) 'garbage)) $\longrightarrow$ 10
+	\item (define (cadr lst) (car (cdr lst))) \\
+	(define-macro (let-macro bindings body) (cons \`\,(lambda ,(map car bindings) ,body) (map cadr bindings))) \\
+
 \end{itemize}
 
-\noindent{\Large Extra Sanity Checks}
+
+
+\noindent{\Large {\color{blue} SQL }}
 \begin{itemize}
-	\item a
-% \begin{figure} [h!]
-% \begin{center}
-% 	\includegraphics[width=0.75\linewidth]{/Users/Alan/Desktop/cs61a_complxity}
-% 	\label{fig}
-% \end{center}
-% \end{figure}
+	\item Constraint: WHERE xxx LIKE `\%[word]\%'
+	\item Order, Limit: ORDER BY [cols] (DESC) LIMIT [lim];
+	\item More on Final Guide right column of page 1
+	\item INSERT INTO table SELECT ... OR INSERT INTO table VALUES etc. (Final Guide)
+	\item (String) concatenation operator: $||$
+	\item SELECT *, COUNT(*) represents choosing/counting all rows
+	\item Aggregate functions: MAX, MIN, COUNT, SUM, AVG, etc.
+	\item Remember to end each statement with a ;
+	\item Declarative programming language (Python, Scheme are imperative)
+\end{itemize}
+
+
+
+\noindent{\Large {\color{blue} Extra Sanity Checks }}
+\begin{itemize}
+	\item In Python, func map and filter returns an {\color{red} iterator}
+	\item Iterable includes iterator, list, string, generator (anything that could be called iter on)
+	\item If a = iter(iterable), then a is iter(a)
+	\item For list mutation (with recursion especially), care about the pointer, i.e. can't reassign passed in lst directly, has to change lst.first and lst.rest
+	\item When removing objects inside a for loop, i.e. deleting a branch from a tree, use ``for b in list(t.branches)'' or ``for b in t.branches.copy()'' or ``for b in t.branches[:]''
+	\item str('a') $\longrightarrow$ 'a'
+	\item Previously... HOF always write another layer outside (for reference issues)
+	\begin{figure} [h!]
+	\begin{center}
+		\includegraphics[width=0.5\linewidth]{/Users/Alan/Desktop/HOF-always}
+		\label{fig}
+	\end{center}
+	\end{figure}
+	\item Scheme
+	\begin{itemize}
+		\item built-in functions: =, quotient, modulo, even?, odd?, etc. (expt 3 5) = $3^5$
+		\item (null? lst) checks if lst is nil
+		\item Unlike in Python, the only primitive in Scheme that is a false value is \#f and its equivalents, false and False. This means that 0 is not false. (false/'false $\longrightarrow$ \#f)
+		\item \#t, \#f can't be operated by $=, >, <$ (with nums or themselves), i.e. $=, >, <$ can only operate on true numbers
+		\item Macros do not have their arguments evaluated, whereas normal Scheme procedures do. Macros have their return value re-evaluated a second time, whereas normal Scheme procedures do not. Normal Scheme procedures take in values and return values. Macros can be seen as taking in code and returning code.
+		\item Scheme $\sim$ Python: (cons elem lst) $\sim$ [elem] + lst; (list elem1 elem2) $\sim$ [elem1, elem2]
+	\end{itemize}
+
+	\item SQL
+	\begin{itemize}
+		\item Remember to end each statement with a ;
+		\item Not equal: != or $<>$
+	\end{itemize}
+	\item Expected topics (if have absolutely no idea, check if one of the topics haven't been tested on):
+	\begin{enumerate}
+		\item WWPD
+		\item Env. Diagram
+		\item Python Lists, Mutation
+		\item Tree Recursion
+		\item Generators
+		\item Scheme
+		\item SQL
+	\end{enumerate}
+
 \end{itemize}
 
 \end{document}

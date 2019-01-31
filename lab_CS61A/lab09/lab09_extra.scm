@@ -13,8 +13,7 @@
 
 ; Q7
 (define (remove item lst)
-
-  (filter (lambda (x) (= item x)) lst)
+  (filter (lambda (x) (not (= x item))) lst))
 
   ;;; Another possible solution
   (cond
@@ -55,7 +54,6 @@
 ; Q10
 (define (sub-all s olds news)
   (cond
-    ( (null? s) () )
     ( (null? olds) s )
     ( else (substitute (sub-all s (cdr olds) (cdr news)) (car olds) (car news)) )
   )
